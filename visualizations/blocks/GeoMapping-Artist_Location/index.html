@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<head>
+	<title>Billboard Hot 100: Artist Location</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<link rel="stylesheet" href="https://cdn.rawgit.com/tmcw-up-for-adoption/chroniton/gh-pages/chroniton-example.css">
+
+	<link rel="stylesheet" type="text/css" href="location.css">
+
+</head>
+
+<body>
+	<div class='container'>
+		<div class='row'>
+			<div class='col-md-12'>
+				<div class='yearTitle'>
+					<h3></h3>
+				</div>
+			</div>
+		</div>	
+	</div>
+
+	<div class='chart-container'>
+		<div class='container'>
+			<div class='row'>
+				<div class='col-md-1'>
+					<div class="btn-group-vertical">
+					  <button type="button" data-zoom="+1" class="btn btn-default btn-xs button-zoom"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+					  <button type="button" data-zoom="-1" class="btn btn-default btn-xs button-zoom"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span></button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<! -- Non data-driven elements -->
+		<svg id='chart'>
+			<g class="map">
+  				<g class="countries"></g>
+  				<g class="cities"></g>
+  			</g>
+		</svg>
+	</div>
+
+	<div id="slider"></div>
+
+	<div class='container'>
+		<div class='row'>
+			<div class='col-md-12'>
+				<table class='table table-hover' id='importantDatesTable'>
+					<thead>
+						<tr>
+							<th>Event</th>
+							<th>Year</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr data-year="1981">
+							<td>MTV</td>
+							<td>1981</td>
+						</tr>
+						<tr data-year="2000">
+							<td>Internet Bubble</td>
+							<td>2000</td>
+						</tr>
+						<tr data-year="2003">
+							<td>iTunes Store</td>
+							<td>2003</td>
+						</tr>
+						<tr data-year="2005">
+							<td>YouTube</td>
+							<td>2005</td>
+						</tr>
+						<tr data-year="2008">
+							<td>Spotify</td>
+							<td>2008</td>
+						</tr>						
+					</tbody>
+				</table>
+			</div>
+		</div>	
+	</div>
+	
+	<!-- Scripts-->
+	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	<script src="https://cdn.rawgit.com/tmcw-up-for-adoption/chroniton/gh-pages/chroniton-only.js"></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script src="location.js"></script>
+		
+</body>
+</html>
