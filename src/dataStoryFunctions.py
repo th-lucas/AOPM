@@ -962,7 +962,7 @@ def get_most_dominant_artist_per_years(unique_artist_df, start_year, end_year, i
             else:    
                 key = "Dominance " + str(year)
 
-            for i in range(lower_bound, upper_bound):
+            for i in range(lower_bound, upper_bound + 1):
                 number_of_tracks_for_current_year += row[i]
             
             current_dominance = number_of_tracks_for_current_year / float(tracks_per_year * interval)
