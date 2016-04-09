@@ -1041,12 +1041,45 @@ def get_valence_by_decade(billboard_df_final):
     end = 2015
     interval = 10
     valence_dict = {}
+    valence_dict_description = {}
     for year in range(start, end, 10):
         current_valence_series = billboard_df_final[(billboard_df_final['Year'] >= year) 
                             & (billboard_df_final['Year'] < (year + interval))]['valence'].dropna()
-        valence_dict[year] = current_valence_series
+        valence_dict[year] = current_valence_series.values
+        valence_dict_description[year] = current_valence_series.describe()
 
-    return valence_dict
+    return valence_dict, valence_dict_description
+
+def create_valence_histogram_per_decade(billboard_df_final):
+    valence_dict = get_valence_by_decade(billboard_df_final)
+    keys = valence_dict.keys()
+    keys.sort()
+
+    fig = plt.figure(figsize=(12, 15))
+    nb_plots = len(keys)
+    if nb_plots > 1:
+        gs = gridspec.GridSpec(nb_plots / 2, 2)
+    else:
+        gs = gridspec.GridSpec(1, 1)
+
+    for index, key in enumerate(keys):
+        interval = 9
+        if key == 2010:
+            interval = 5
+        ax = fig.add_subplot(gs[index / 2, index % 2])
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.get_xaxis().tick_bottom()
+        ax.get_yaxis().tick_left()
+
+        plt.xlabel('Valence')
+        plt.ylabel('Frequency')
+        endYear = key + interval
+        plt.title('Histogram of Valence for ' + str(key) + ' to ' + str(endYear), fontsize=14)
+
+        n, bins, patches = plt.hist(valence_dict[key], normed = False, color = colors_list_tableau[index], bins = 20)
+
+        gs.update(wspace=0.2, hspace=0.3)   
 
 
 
