@@ -995,7 +995,7 @@ def get_most_dominant_artist_per_years(unique_artist_df, start_year, end_year, i
     return entries_count_by_artist
 
 
-def getTrackCountryOfOrigin(billboard_df_final):
+def get_track_country_of_origin(billboard_df_final):
     geolocator = Nominatim()
     track_state_of_origin = []
     track_country_of_origin = []
@@ -1026,13 +1026,31 @@ def getTrackCountryOfOrigin(billboard_df_final):
 
     return [track_country_of_origin, track_state_of_origin]
 
-def addTrackCountryOfOriginToDF(billboard_df_final):
-    country_and_state_array = getTrackCountryOfOrigin(billboard_df_final)
+def add_track_country_of_origin_to_DF(billboard_df_final):
+    country_and_state_array = get_track_country_of_origin(billboard_df_final)
     country_and_state_dict = {"country": country_and_state_array[0], "state": country_and_state_array[1]}
     track_country_and_state_of_origin_df = pd.DataFrame(country_and_state_dict, columns = ["country", "state"])
     billboard_df_final_new = pd.concat([billboard_df_final, track_country_and_state_of_origin_df], axis=1)
 
     billboard_df_final_new.to_csv('CSV_data/billboard_df_final_new.csv', sep=',')
     return billboard_df_final_new
+
+
+def get_valence_by_decade(billboard_df_final):
+    start = 1960
+    end = 2015
+    interval = 10
+    valence_dict = {}
+    for year in range(start, end, 10):
+        current_valence_series = billboard_df_final[(billboard_df_final['Year'] >= year) 
+                            & (billboard_df_final['Year'] < (year + interval))]['valence'].dropna()
+        valence_dict[year] = current_valence_series
+
+    return valence_dict
+
+
+
+
+
 
 
