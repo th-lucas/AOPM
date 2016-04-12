@@ -1051,7 +1051,7 @@ def get_valence_by_decade(billboard_df_final):
     return valence_dict, valence_dict_description
 
 def create_valence_histogram_per_decade(billboard_df_final):
-    valence_dict = get_valence_by_decade(billboard_df_final)
+    valence_dict, valence_dict_description = get_valence_by_decade(billboard_df_final)
     keys = valence_dict.keys()
     keys.sort()
 
