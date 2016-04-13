@@ -1036,6 +1036,12 @@ def add_track_country_of_origin_to_DF(billboard_df_final):
     return billboard_df_final_new
 
 
+# def fill_missing_data_with_median(dataframe, series_to_fill, column_name):
+#     series_median = series_to_fill.dropna().median()
+#     if len(series_to_fill[ series_to_fill.isnull() ]) > 0:
+#         dataframe.loc[ (series_to_fill.isnull()), column_name] = series_median
+
+
 def get_valence_by_decade(billboard_df_final):
     start = 1960
     end = 2015
@@ -1077,13 +1083,102 @@ def create_valence_histogram_per_decade(billboard_df_final):
         endYear = key + interval
         plt.title('Histogram of Valence for ' + str(key) + ' to ' + str(endYear), fontsize=14)
 
-        n, bins, patches = plt.hist(valence_dict[key], normed = False, color = colors_list_tableau[index], bins = 20)
+        n, bins, patches = plt.hist(valence_dict[key], normed = False, color = colors_list_tableau[2 * index + 1], bins = 20)
 
         gs.update(wspace=0.2, hspace=0.3)   
 
 
+def get_energy_by_decade(billboard_df_final):
+    start = 1960
+    end = 2015
+    interval = 10
+    energy_dict = {}
+    energy_dict_description = {}
+    for year in range(start, end, 10):
+        current_energy_series = billboard_df_final[(billboard_df_final['Year'] >= year) 
+                            & (billboard_df_final['Year'] < (year + interval))]['energy'].dropna()
+        energy_dict[year] = current_energy_series.values
+        energy_dict_description[year] = current_energy_series.describe()
+
+    return energy_dict, energy_dict_description
+
+def create_energy_histogram_per_decade(billboard_df_final):
+    energy_dict, energy_dict_description = get_energy_by_decade(billboard_df_final)
+    keys = energy_dict.keys()
+    keys.sort()
+
+    fig = plt.figure(figsize=(12, 15))
+    nb_plots = len(keys)
+    if nb_plots > 1:
+        gs = gridspec.GridSpec(nb_plots / 2, 2)
+    else:
+        gs = gridspec.GridSpec(1, 1)
+
+    for index, key in enumerate(keys):
+        interval = 9
+        if key == 2010:
+            interval = 5
+        ax = fig.add_subplot(gs[index / 2, index % 2])
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+        ax.get_xaxis().tick_bottom()
+        ax.get_yaxis().tick_left()
+
+        plt.xlabel('Energy')
+        plt.ylabel('Frequency')
+        endYear = key + interval
+        plt.title('Histogram of Energy for ' + str(key) + ' to ' + str(endYear), fontsize=14)
+
+        n, bins, patches = plt.hist(energy_dict[key], normed = False, color = colors_list_tableau[2 * index + 1], bins = 20)
+
+        gs.update(wspace=0.2, hspace=0.3)   
+
+def map_color_to_decade(year_series):
+    colors = []
+    for year in year_series.values:
+        if year < 1970:
+            colors.append(colors_list_tableau[0])
+        elif (1970 <= year and year < 1980): 
+            colors.append(colors_list_tableau[2])
+        elif (1980 <= year and year < 1990): 
+            colors.append(colors_list_tableau[4])
+        elif (1990 <= year and year < 2000): 
+            colors.append(colors_list_tableau[6])
+        elif (2000 <= year and year < 2010): 
+            colors.append(colors_list_tableau[8])
+        elif (2010 <= year and year < 2020): 
+            colors.append(colors_list_tableau[10])
+
+    return colors
 
 
+def prepare_data_for_valence_vs_energy_scatter_plot(billboard_df_final):
+    df_temp = pd.concat([billboard_df_final['Year'], billboard_df_final['valence'], billboard_df_final['energy']], axis=1, keys=['year', 'valence', 'energy'])
+    x = df_temp['valence'].values
+    y = df_temp['energy'].values
+    colors = map_color_to_decade(df_temp['year'])
 
+    # Plot
+    plt.figure(figsize=(16, 10))
+    plt.xlabel('Valence')
+    plt.ylabel('Energy')
+    plt.title('Musical Mood of the Billboard Tracks')
+    plt.grid(False)
+    #plt.xlim((-0.01, 1.01))
+    #plt.ylim((-0.01, 1.01))
+
+    # Remove the plot frame lines
+    ax = plt.subplot(111)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines['left'].set_position(('data', 0.5))
+    ax.spines['bottom'].set_position(('data', 0.5))
+
+    # Ensure that the axis ticks only show up on the bottom and left of the plot.
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+
+    plt.scatter(x, y, s = 50, c = colors, alpha = 0.5)
+    plt.show()
 
 
