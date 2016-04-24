@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<head>
+	<title>Billboard Hot 100: Musical Mood</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="mood.css">
+
+</head>
+
+<body>
+	<div class='container'>
+		<div class='row top-buffer'>
+			<div class='col-md-12 decadeSelectorParent'>
+				<div id='decadeSelector' class='btn-group' data-toggle="buttons">
+					<label class="btn btn-default btn-all active">
+            			<input type="checkbox" name="decadeSelectorButton" id="btn-all" value="all">All
+        			</label>
+        			<label class="btn btn-default btn-60s">
+            			<input type="checkbox" name="decadeSelectorButton" id="btn-60s" value="_60s">60s
+        			</label>
+        			<label class="btn btn-default btn-70s">
+            			<input type="checkbox" name="decadeSelectorButton" id="btn-70s" value="_70s">70s
+        			</label>
+        			<label class="btn btn-default btn-80s">
+            			<input type="checkbox" name="decadeSelectorButton" id="btn-80s" value="_80s">80s
+        			</label>
+        			<label class="btn btn-default btn-90s">
+            			<input type="checkbox" name="decadeSelectorButton" id="btn-90s" value="_90s">90s
+        			</label>
+        			<label class="btn btn-default btn-00s">
+            			<input type="checkbox" name="decadeSelectorButton" id="btn-00s" value="_00s">00s
+        			</label>
+        			<label class="btn btn-default btn-10s">
+            			<input type="checkbox" name="decadeSelectorButton" id="btn-10s" value="_10s">10s
+        			</label>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class='chart-container'>
+		<! -- Non data-driven elements -->
+		<svg id='chart4'>
+			<g id='chart-wrapper4' class='chart-wrapper'>
+				<g class='x axis'> </g>
+				<g class='y axis'> </g>
+				<g class='grids'></g>
+				<g class='circles'></g>
+				<g class='averageLines'></g>
+			</g>
+		</svg>
+	</div>
+	
+	<div class='container bottom-buffer'>
+		<!--<div class="row">
+			<div class="col-md-8 col-sm-8 col-md-offset-2 col-sm-offset-2">
+				<span class="slider-label">1960</span> 
+				<input id="dateRangeSlider" type="text" value="" data-slider-min="1960" data-slider-max="2015" data-slider-step="1" data-slider-value="[1960, 2015]"/> 
+				<span class="slider-label">2015</span> 
+			</div>
+		</div>-->
+		<div class='row'>
+			<div class='col-md-12'>
+				<div class='bs-callout bs-callout-info artistDetails' id='artistDetails'>
+					<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<div class='row'>
+						<div class='col-md-2 col-sm-4 col-xs-4'>
+							<div class='artistNameImageDiv'>
+								<img class='artistNameImage img-thumbnail img-responsive'>
+							</div>
+						</div>
+						<div class='col-md-10 col-sm-8 col-xs-8'>
+							<div class='artistNameTitleDiv'>
+								<h3 class='artistNameTitle'></h3>
+							</div>
+						</div>
+
+					</div>
+					<div class='row'>
+						<div class='col-md-12'>
+							<div class='artistSongListDiv'>
+								<table class='table table-hover'>
+									<thead>
+										<tr>
+											<th>Song Title</th>
+											<th>Year</th>
+											<th>Rank</th>
+											<th>Track Preview</th>
+										</tr>
+									</thead>
+									<tbody></tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+
+	<!-- Scripts-->
+	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script src="https://cdn.rawgit.com/JMPerez/spotify-web-api-js/master/src/spotify-web-api.js"></script>
+	<script src="mood.js"></script>
+		
+</body>
+</html>

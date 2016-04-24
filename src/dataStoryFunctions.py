@@ -1153,10 +1153,10 @@ def map_color_to_decade(year_series):
 
 
 def prepare_data_for_valence_vs_energy_scatter_plot(billboard_df_final):
-    df_temp = pd.concat([billboard_df_final['Year'], billboard_df_final['valence'], billboard_df_final['energy']], axis=1, keys=['year', 'valence', 'energy'])
+    df_temp = billboard_df_final[['Year', 'valence', 'energy']]
     x = df_temp['valence'].values
     y = df_temp['energy'].values
-    colors = map_color_to_decade(df_temp['year'])
+    colors = map_color_to_decade(df_temp['Year'])
 
     # Plot
     plt.figure(figsize=(16, 10))
@@ -1164,8 +1164,8 @@ def prepare_data_for_valence_vs_energy_scatter_plot(billboard_df_final):
     plt.ylabel('Energy')
     plt.title('Musical Mood of the Billboard Tracks')
     plt.grid(False)
-    #plt.xlim((-0.01, 1.01))
-    #plt.ylim((-0.01, 1.01))
+    plt.xlim((-0.01, 1.01))
+    plt.ylim((-0.01, 1.01))
 
     # Remove the plot frame lines
     ax = plt.subplot(111)
@@ -1180,5 +1180,106 @@ def prepare_data_for_valence_vs_energy_scatter_plot(billboard_df_final):
 
     plt.scatter(x, y, s = 50, c = colors, alpha = 0.5)
     plt.show()
+
+
+def prepare_data_for_scatter_plot_per_decade(df):
+	df_dict = {}
+	df_dict[1960] = df[df['Year'] < 1970]
+	df_dict[1970] = df[(df['Year'] >= 1970) & (df['Year'] < 1980)]
+	df_dict[1980] = df[(df['Year'] >= 1980) & (df['Year'] < 1990)]
+	df_dict[1990] = df[(df['Year'] >= 1990) & (df['Year'] < 2000)]
+	df_dict[2000] = df[(df['Year'] >= 2000) & (df['Year'] < 2010)]
+	df_dict[2010] = df[(df['Year'] >= 2010) & (df['Year'] < 2020)]
+
+	return df_dict
+
+def create_valence_vs_energy_scatter_plot_per_decade(billboard_df_final):
+	df_temp = billboard_df_final[['Year', 'valence', 'energy', 'mode']]
+	df_dict = prepare_data_for_scatter_plot_per_decade(df_temp)
+
+	colors = map_color_to_decade(df_temp['Year'])
+	keys = df_dict.keys()
+	keys.sort()
+
+	fig = plt.figure(figsize=(12, 15))
+	nb_plots = len(keys)
+	if nb_plots > 1:
+	    gs = gridspec.GridSpec(nb_plots / 2, 2)
+	else:
+	    gs = gridspec.GridSpec(1, 1)
+
+	for index, key in enumerate(keys):
+		interval = 9
+		if key == 2010:
+			interval = 5
+
+		df_dict[key] = df_dict[key].dropna()
+		x = df_dict[key]['valence'].values
+		x_mean = x.mean()
+		y = df_dict[key]['energy'].values
+		y_mean = y.mean()
+
+		valence_mean_coords = [[x_mean, x_mean], [-1, 1]]
+		energy_mean_coords = [[-1, 1], [y_mean, y_mean]]
+
+		x_major = df_dict[key][df_dict[key]['mode'] == 1]['valence']
+		x_major_mean = x_major.mean()
+		y_major = df_dict[key][df_dict[key]['mode'] == 1]['energy']
+		y_major_mean = y_major.mean()
+
+		valence_major_mean_coords = [[x_major_mean, x_major_mean], [-1, 1]]
+		energy_major_mean_coords = [[-1, 1], [y_major_mean, y_major_mean]]
+
+		x_minor = df_dict[key][df_dict[key]['mode'] == 0]['valence']
+		x_minor_mean = x_minor.mean()
+		y_minor = df_dict[key][df_dict[key]['mode'] == 0]['energy']
+		y_minor_mean = y_minor.mean()
+
+		valence_minor_mean_coords = [[x_minor_mean, x_minor_mean], [-1, 1]]
+		energy_minor_mean_coords = [[-1, 1], [y_minor_mean, y_minor_mean]]
+
+		print "x:", len(x)
+		print "x major:", len(x_major)
+		print "x minor:", len(x_minor)
+
+		print "x mean:", x_mean
+		print "x major mean:", x_major_mean
+		print "x minor mean:", x_minor_mean
+
+		ax = fig.add_subplot(gs[index / 2, index % 2])
+		ax.spines["top"].set_visible(False)
+		ax.spines["right"].set_visible(False)
+		ax.get_xaxis().tick_bottom()
+		ax.get_yaxis().tick_left()
+
+		plt.grid(False)
+		plt.xlim((-0.01, 1.01))
+		plt.ylim((-0.01, 1.01))
+		plt.xlabel('Valence')
+		plt.ylabel('Energy')
+		endYear = key + interval
+		plt.title('Musical Mood between ' + str(key) + ' to ' + str(endYear), fontsize=14)
+
+		#plt.scatter(x_major, y_major, s = 50, c = colors_list_tableau[2 * index], alpha = 0.5)
+		plt.scatter(x_minor, y_minor, s = 50, c = colors_list_tableau[2 * index], alpha = 0.5, marker='+')
+
+		# x mean 
+		plt.plot(valence_mean_coords[0], valence_mean_coords[1], color = colors_list_tableau[2 * index])
+		# y mean
+		plt.plot(energy_mean_coords[0], energy_mean_coords[1], color = colors_list_tableau[2 * index])
+
+		# x mean 
+		plt.plot(valence_minor_mean_coords[0], valence_minor_mean_coords[1], color = colors_list_tableau[2 * index + 1])
+		# y mean
+		plt.plot(energy_minor_mean_coords[0], energy_minor_mean_coords[1], color = colors_list_tableau[2 * index + 1])
+
+		# x mean 
+		plt.plot(valence_major_mean_coords[0], valence_major_mean_coords[1], color = "black")
+		# y mean
+		plt.plot(energy_major_mean_coords[0], energy_major_mean_coords[1], color = "black")
+
+		gs.update(wspace=0.2, hspace=0.3)
+
+
 
 
