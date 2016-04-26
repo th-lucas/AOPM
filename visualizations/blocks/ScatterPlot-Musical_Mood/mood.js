@@ -575,7 +575,7 @@ allButton.on('click', function(){
 	decadeButtons.classed('active', false);
 	d3.select('.averageLines')
 			.selectAll('line').style('display', 'none');	
-			
+
 	if(d3.select(this).classed('active')){
 		d3.select('.circles')
 			.selectAll('circle').style('opacity', 0);
@@ -587,6 +587,14 @@ allButton.on('click', function(){
 		d3.select('.averageLines')
 			.selectAll('line.all').style('display', 'block');
 	}
+});
+
+d3.selectAll('.band-img').on('mouseover', function(){
+	d3.select(this).classed('grey-scale', false);
+});
+
+d3.selectAll('.band-img').on('mouseout', function(){
+	d3.select(this).classed('grey-scale', true);
 });
 
 // Close button for the artist details area
