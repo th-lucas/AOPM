@@ -128,24 +128,32 @@ function updateCircles4(dataset) {
 	u.enter()
 		.append('circle')
 		.attr('class', function(d) {
+			var currentClass = '';
 			if(d['Year'] < 1970){
-				return '_60s';
-			}
+				currentClass = '_60s';
+			} 
         	else if (1970 <= d['Year'] && d['Year'] < 1980){
-        		return '_70s';
+        		currentClass = '_70s';
         	} 
         	else if (1980 <= d['Year'] && d['Year'] < 1990){
-				return '_80s';
+				currentClass = '_80s';
         	}
         	else if (1990 <= d['Year'] && d['Year'] < 2000){
-        		return '_90s';
+        		currentClass = '_90s';
         	}
         	else if (2000 <= d['Year'] && d['Year'] < 2010){
-        		return '_00s';
+        		currentClass = '_00s';
         	} 
         	else if (2010 <= d['Year']){
-        		return '_10s';
+        		currentClass = '_10s';
         	}
+
+        	var matches = d['Artist'].match(/.*(rihanna|eminem|mariah carey|madonna|elton john|the beatles).*/i);
+			if(matches !== null){
+				var tempClassName = matches[1].toLowerCase();
+				currentClass += ' ' + tempClassName.replace(/ /g,"-");
+			}
+			return currentClass;
 		});
 
 	u.exit().remove();
@@ -595,6 +603,19 @@ d3.selectAll('.band-img').on('mouseover', function(){
 
 d3.selectAll('.band-img').on('mouseout', function(){
 	d3.select(this).classed('grey-scale', true);
+});
+
+d3.selectAll('.band-img').on('click', function(){
+	var clickedID = d3.select(this).attr('id');
+	var tracksToDisplay = d3.select('.circles')
+							.selectAll('circle')
+							.filter(function() { 
+								return d3.select(this).classed(clickedID); 
+							});
+	d3.select('.circles')
+				.selectAll('circle')
+				.style('opacity', 0);
+	tracksToDisplay.style('opacity', 1);
 });
 
 // Close button for the artist details area
