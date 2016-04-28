@@ -25,8 +25,9 @@
 				'Year': +d['Year'],
 				'Energy': +d['energy'],
 				'Valence': +d['valence'],
-				'Artist': d['Artist(s)'],
-				'Title': d['Title']
+				'Artist(s)': d['Artist(s)'],
+				'Title': d['Title'],
+				'Lead Artist(s)': d['Lead Artist(s)']
 			};
 		});
 
@@ -37,7 +38,7 @@
 		// Chart creation
 
 		// Tooltip creation			
-		//createToolTip();
+		createToolTip();
 		// Axis label creation		
 		createAxesLabels4();
 		// Gridlines creation
@@ -148,7 +149,7 @@ function updateCircles4(dataset) {
         		currentClass = '_10s';
         	}
 
-        	var matches = d['Artist'].match(/.*(rihanna|eminem|mariah carey|madonna|elton john|the beatles).*/i);
+        	var matches = d['Artist(s)'].match(/.*(rihanna|eminem|mariah carey|madonna|elton john|the beatles).*/i);
 			if(matches !== null){
 				var tempClassName = matches[1].toLowerCase();
 				currentClass += ' ' + tempClassName.replace(/ /g,"-");
@@ -164,38 +165,64 @@ function updateCircles4(dataset) {
 		.style('stroke-width', '1px');
 		//.style('stroke', '#656D78');
 
-	/*u.on('mouseover', function(d) {
+	u.on('mouseover', function(d) {
 		var selectedCircle = d3.select(this);
-		var allCircles = d3.selectAll('circle');
+		if(selectedCircle.classed('tracksToDisplay')){				
 
-		// All other circles are faded out
-		allCircles.filter(function(x) { return d['Artist(s)'] != x['Artist(s)']; })
-		        .style('opacity', 0.2);				
+			selectedCircle.transition()
+				.duration(200)
+				.attr('r', hoveredRadius4)
+				.each("end", function(d){ return tip.show(d, this); });
 
-		selectedCircle.transition()
-			.duration(200)
-			.attr('r', hoveredRadius)
-			.each("end", function(d){ return tip.show(d, this); });
-
-		selectedCircle.moveToFront();		
+			selectedCircle.moveToFront();
+		}
 	});
 
 	u.on('mouseout', function(d) {
 		var selectedCircle = d3.select(this);
-		
-		var allCircles = d3.selectAll('circle')
-						.style('opacity', 1);
+		if(selectedCircle.classed('tracksToDisplay')){		
 
-		selectedCircle.attr('r', radius)
-						.transition()
-						.duration(200);
-		
-		selectedCircle.moveToBack();
-		tip.hide(d);
+			selectedCircle.attr('r', radiusValues4['Big'])
+							.transition()
+							.duration(200);
 			
+			tip.hide(d);
+		}		
 	});
 
 	u.on('click', function(d) {
+		var selectedCircle = d3.select(this);
+		if(selectedCircle.classed('tracksToDisplay')){	
+			spotifyApi.searchTracks(d['Lead Artist(s)'] + ' ' + d['Title'] , {limit: 1})
+				.then(function(data) {
+					var previousUrl = d3.select('#audio-player')
+										.select('source.mpeg')
+										.attr('src');
+
+					var previewUrl = data.tracks.items[0].preview_url;
+
+					if(previousUrl != previewUrl){
+						d3.select('#audio-player')
+							.selectAll('source').attr('src', previewUrl);
+
+						d3.select('#audio-player')[0][0].load();
+						d3.select('#audio-player')[0][0].play();
+						selectedCircle.classed('playing', true);
+					} else {
+						var hasClass = d3.select('#audio-player').classed('active');
+						d3.select('#audio-player').classed('active', !hasClass);
+
+						if(hasClass){
+							d3.select('#audio-player')[0][0].pause();
+						} else {
+							d3.select('#audio-player')[0][0].play();
+						}
+					}
+				});
+		}
+	});
+
+	/*u.on('click', function(d) {
 		var selectedCircle = d3.select(this);
 		
 		var artistDetails = d3.select('div.artistDetails').style('display', 'block');
@@ -346,21 +373,14 @@ function createToolTip(){
 	    .attr('class', 'd3-tip')
 	    .offset([-10, 0])
 	    .html(function(d) {
-	    	var dominanceYearList = d['Dominance Max'].years;
-	    	var dominanceYearPrint = "";
-	    	for(var i = 0; i < dominanceYearList.length; i++){
-	    		dominanceYearPrint += dominanceYearList[i].split("Dominance")[1];
-	    		if(i != dominanceYearList.length - 1){
-	    			dominanceYearPrint += " / ";
-	    		}
-	    	}
 			return "<div><span class='tooltipTitle'>" + d['Artist(s)']+ "</span></div>" +
-			      "<div><span>" + valueToDisplay + ":</span> <span class='tooltipContents'>" + (d[valueToDisplay] * 100).toFixed(2) + "%</span></div>" +
-			     "<div><span>Dominance Max:</span> <span class='tooltipContents'>" + (d['Dominance Max'].value * 100).toFixed(2) + "%</span></div>" +
-			     "<div><span>Years:</span> <span class='tooltipContents'>" + dominanceYearPrint + "</span></div>";
+			      "<div><span>Track:</span> <span class='tooltipContents'>" + d['Title']+ "</span></div>" +
+			     "<div><span>Year:</span> <span class='tooltipContents'>" + d['Year']+ "</span></div>" + 
+			     "<div><span>Valence:</span> <span class='tooltipContents'>" + d['Valence']+ "</span></div>" +
+			     "<div><span>Energy:</span> <span class='tooltipContents'>" + d['Energy']+ "</span></div>";
 		});
 
-	container.call(tip);
+	container4.call(tip);
 }
 
 // Resize function which makes the graph responsive
@@ -492,6 +512,22 @@ function setXValues(valueToDisplay){
 	}
 }
 
+function decadeButtonsShowHideCircles(){
+	d3.select('.circles')
+		.selectAll('circle').style("opacity", 1);
+	d3.select('.averageLines')
+			.selectAll('line').style('display', 'block');
+
+	var val = null;	
+	d3.select('#decadeSelector').selectAll('label:not(.active_bis)').each(function(){
+		val = d3.select(this).select('input').node().value;
+		d3.select('.circles')
+			.selectAll('circle.' + val).style('opacity', 0);
+		d3.select('.averageLines')
+			.selectAll('line.' + val).style('display', 'none');
+	});
+}
+
 /* **************************************************** *
  *                 		   Main                         *
  * **************************************************** */
@@ -550,6 +586,11 @@ decadeButtons.on('click', function(){
 	d3.select('.averageLines')
 			.selectAll('line.all').style('display', 'none');
 
+	d3.selectAll('.band-img').classed('active-artist', false);
+	d3.select('.circles')
+			.selectAll('circle')
+			.attr('r', radius4);
+
 	d3.select(this).classed('inactive', false);
 
 	if(d3.select(this).classed('active_bis')){
@@ -560,17 +601,7 @@ decadeButtons.on('click', function(){
 	
 	d3.select('#decadeSelector').selectAll('label:not(.active_bis)').classed('inactive', true);
 	
-	d3.select('.circles')
-		.selectAll('circle').style("opacity", 1);
-	d3.select('.averageLines')
-			.selectAll('line').style('display', 'block');
-	d3.select('#decadeSelector').selectAll('label:not(.active_bis)').each(function(){
-		val = d3.select(this).select('input').node().value;
-		d3.select('.circles')
-			.selectAll('circle.' + val).style('opacity', 0);
-		d3.select('.averageLines')
-			.selectAll('line.' + val).style('display', 'none');
-	});
+	decadeButtonsShowHideCircles();
 	
 });
 
@@ -583,6 +614,11 @@ allButton.on('click', function(){
 	decadeButtons.classed('active', false);
 	d3.select('.averageLines')
 			.selectAll('line').style('display', 'none');	
+
+	d3.selectAll('.band-img').classed('active-artist', false);
+	d3.select('.circles')
+			.selectAll('circle')
+			.attr('r', radius4);
 
 	if(d3.select(this).classed('active')){
 		d3.select('.circles')
@@ -597,6 +633,8 @@ allButton.on('click', function(){
 	}
 });
 
+
+// Representative artists logic
 d3.selectAll('.band-img').on('mouseover', function(){
 	d3.select(this).classed('grey-scale', false);
 });
@@ -607,16 +645,51 @@ d3.selectAll('.band-img').on('mouseout', function(){
 
 d3.selectAll('.band-img').on('click', function(){
 	var clickedID = d3.select(this).attr('id');
-	var tracksToDisplay = d3.select('.circles')
+	if(d3.select(this).classed('active-artist')){
+		d3.select(this).classed('active-artist', false);
+		d3.select('.circles')
+			.selectAll('circle')
+			.attr('r', radius4);
+		d3.select('.circles')
+			.selectAll('circle')
+			.classed('tracksToDisplay', false);
+		if(d3.select('.btn-all').classed('active')){
+			d3.select('.circles')
+						.selectAll('circle')
+						.style('opacity', 1);
+			d3.select('.averageLines')
+				.selectAll('line').style('display', 'none');
+			d3.select('.averageLines')
+				.selectAll('line.all').style('display', 'block');
+		} else{
+			decadeButtonsShowHideCircles();
+		}		
+	} else {
+		d3.selectAll('.band-img').classed('active-artist', false);
+		d3.select(this).classed('active-artist', true);
+		var tracksToDisplay = d3.select('.circles')
 							.selectAll('circle')
 							.filter(function() { 
 								return d3.select(this).classed(clickedID); 
 							});
-	d3.select('.circles')
-				.selectAll('circle')
-				.style('opacity', 0);
-	tracksToDisplay.style('opacity', 1);
+		d3.select('.circles')
+					.selectAll('circle')
+					.style('opacity', 0.1);
+		tracksToDisplay.style('opacity', 1)
+					   .attr('r', radiusValues4['Big'])
+					   .classed('tracksToDisplay', true)
+					   .moveToFront();
+		if(!d3.select('.btn-all').classed('active')){
+			d3.select('#decadeSelector').selectAll('label:not(.active_bis)').each(function(){
+				val = d3.select(this).select('input').node().value;
+				d3.select('.circles').selectAll('circle.' + val).style('opacity', 0);
+			});
+		}
+	}	
 });
+
+
+
 
 // Close button for the artist details area
 /*d3.select('.close').on('click', function(){
@@ -633,9 +706,9 @@ sliderDateRange.on('slideStop', function(){
 	clearGraph();
 	createChart();
 });
-
+*/
 // Instantiate Spotify wrapper
-var spotifyApi = new SpotifyWebApi();*/
+var spotifyApi = new SpotifyWebApi();
 
 // Dataset init and chart creation
 var dataset4 = [];

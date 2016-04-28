@@ -131,6 +131,43 @@ circle:hover {
   cursor: pointer;
 }
 
+/*@-webkit-keyframes color_change {
+  0% { background-color: blue; }
+  100% { background-color: red; }
+}
+@-moz-keyframes color_change {
+  0% { background-color: blue; }
+  100% { background-color: red; }
+}
+@-ms-keyframes color_change {
+  0% { background-color: blue; }
+  100% { background-color: red; }
+}
+@-o-keyframes color_change {
+  0% { background-color: blue; }
+  100% { background-color: red; }
+}
+@keyframes color_change {
+  0% { background-color: blue; }
+  100% { background-color: red; }
+}
+
+circle.playing {
+  -webkit-animation: color_change 1s infinite alternate;
+  -moz-animation: color_change 1s infinite alternate;
+  -ms-animation: color_change 1s infinite alternate;
+  -o-animation: color_change 1s infinite alternate;
+  animation: color_change 1s infinite alternate;
+}*/
+
+#chart4 circle:hover {
+  cursor: default;
+}
+
+#chart4 circle.tracksToDisplay:hover {
+  cursor: pointer;
+}
+
 .legendCircle circle:hover {
   cursor: default;
 }
@@ -264,7 +301,7 @@ label.inactive {
 
 /* Audio player */
 
-td audio {
+audio {
   display: none !important;
 }
 
@@ -390,16 +427,23 @@ div.slider.slider-horizontal {
 }
 
 .img-col {
-    margin-right: 20px;
-    width: 57px;
+  margin-right: 20px;
+  width: 57px;
 }
 
 .grey-scale {
-    -webkit-filter: grayscale(100%);
-    filter: grayscale(100%);
-    filter: gray;
-    filter: url("data:image/svg+xml;utf8,<svg version='1.1' xmlns='http://www.w3.org/2000/s….3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0' /></filter></svg>#greyscale");
-    opacity: .7;
+  -webkit-filter: grayscale(100%);
+  filter: grayscale(100%);
+  filter: gray;
+  filter: url("data:image/svg+xml;utf8,<svg version='1.1' xmlns='http://www.w3.org/2000/s….3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0' /></filter></svg>#greyscale");
+  opacity: .7;
+}
+
+.active-artist, .grey-scale.active-artist {
+  filter: none; /* works for firefox */
+  -webkit-filter: none; /*for chrome/ safari */
+  -webkit-transition: none;
+  opacity: 1;
 }
 
 .band-img {
