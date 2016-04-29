@@ -149,7 +149,7 @@ function updateCircles4(dataset) {
         		currentClass = '_10s';
         	}
 
-        	var matches = d['Artist(s)'].match(/.*(rihanna|eminem|mariah carey|madonna|elton john|the beatles).*/i);
+        	var matches = d['Artist(s)'].match(/.*(rihanna|eminem|mariah carey|michael jackson|stevie wonder|the beatles).*/i);
 			if(matches !== null){
 				var tempClassName = matches[1].toLowerCase();
 				currentClass += ' ' + tempClassName.replace(/ /g,"-");
@@ -180,13 +180,13 @@ function updateCircles4(dataset) {
 
 	u.on('mouseout', function(d) {
 		var selectedCircle = d3.select(this);
-		if(selectedCircle.classed('tracksToDisplay')){		
-
+		if(selectedCircle.classed('tracksToDisplay') && !(selectedCircle.classed('playing'))){		
 			selectedCircle.attr('r', radiusValues4['Big'])
 							.transition()
 							.duration(200);
 			
 			tip.hide(d);
+			selectedCircle.moveToBack();
 		}		
 	});
 
@@ -206,18 +206,38 @@ function updateCircles4(dataset) {
 							.selectAll('source').attr('src', previewUrl);
 
 						d3.select('#audio-player')[0][0].load();
-						d3.select('#audio-player')[0][0].play();
+						d3.select('#audio-player')[0][0].play()
+														.then(function(){
+															pulse();
+														});
 						selectedCircle.classed('playing', true);
+						d3.select('#audio-player').classed('active', true);
+						
 					} else {
 						var hasClass = d3.select('#audio-player').classed('active');
 						d3.select('#audio-player').classed('active', !hasClass);
 
 						if(hasClass){
 							d3.select('#audio-player')[0][0].pause();
+							selectedCircle.classed('playing', false);
 						} else {
-							d3.select('#audio-player')[0][0].play();
+							d3.select('#audio-player')[0][0].play()
+															.then(function(){
+																pulse();
+															});
+							selectedCircle.classed('playing', true);
 						}
 					}
+
+					d3.select('#audio-player').on('ended', function(){
+						selectedCircle.classed('playing', false);
+						selectedCircle.attr('r', radiusValues4['Big'])
+										.transition()
+										.duration(200);
+			
+						tip.hide(d);
+						selectedCircle.moveToBack();
+					});
 				});
 		}
 	});
@@ -526,6 +546,20 @@ function decadeButtonsShowHideCircles(){
 		d3.select('.averageLines')
 			.selectAll('line.' + val).style('display', 'none');
 	});
+}
+
+function pulse() {
+	(function repeat() {
+		var selectedCircle = d3.select('.circles').selectAll('circle.playing');
+		selectedCircle = selectedCircle.transition()
+			.duration(2000)
+			.attr("r", radiusValues4['Big'])
+			.transition()
+			.duration(2000)
+			.attr("r", hoveredRadius4)
+			.ease('sine')
+			.each("end", repeat);
+	})();
 }
 
 /* **************************************************** *

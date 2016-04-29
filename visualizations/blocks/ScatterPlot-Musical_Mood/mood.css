@@ -54,6 +54,10 @@
   border-radius: 4px;
 }
 
+#chart4 {
+  background-color: transparent; 
+}
+
 #chart3 g.map g.countries path {
   /*fill: #FFF;*/
   stroke: #000;
@@ -131,34 +135,6 @@ circle:hover {
   cursor: pointer;
 }
 
-/*@-webkit-keyframes color_change {
-  0% { background-color: blue; }
-  100% { background-color: red; }
-}
-@-moz-keyframes color_change {
-  0% { background-color: blue; }
-  100% { background-color: red; }
-}
-@-ms-keyframes color_change {
-  0% { background-color: blue; }
-  100% { background-color: red; }
-}
-@-o-keyframes color_change {
-  0% { background-color: blue; }
-  100% { background-color: red; }
-}
-@keyframes color_change {
-  0% { background-color: blue; }
-  100% { background-color: red; }
-}
-
-circle.playing {
-  -webkit-animation: color_change 1s infinite alternate;
-  -moz-animation: color_change 1s infinite alternate;
-  -ms-animation: color_change 1s infinite alternate;
-  -o-animation: color_change 1s infinite alternate;
-  animation: color_change 1s infinite alternate;
-}*/
 
 #chart4 circle:hover {
   cursor: default;
@@ -229,26 +205,32 @@ line._10s {
 }
 
 label.btn-60s, label.btn-60s.active_bis{ 
+  font-family: 'Font60s';
   background-color: rgba(31, 119, 180, 0.5);
 }
 
 label.btn-70s, label.btn-70s.active_bis {
+  font-family: 'Font70s';
   background-color: rgba(255, 127, 14, 0.5);
 }
 
 label.btn-80s, label.btn-80s.active_bis {
+  font-family: 'Font80s';
   background-color: rgba(44, 160, 44, 0.5);
 }
 
 label.btn-90s, label.btn-90s.active_bis {
+  font-family: 'Font90s';
   background-color: rgba(214, 39, 40, 0.5);
 }
 
 label.btn-00s, label.btn-00s.active_bis {
+  font-family: 'Font00s';
   background-color: rgba(148, 103, 189, 0.5);
 }
 
 label.btn-10s, label.btn-10s.active_bis {
+  font-family: 'Font10s';
   background-color: rgba(140, 86, 75, 0.5);
 }
 
@@ -406,12 +388,12 @@ div.slider.slider-horizontal {
   background-image: url(http://img2-ak.lst.fm/i/u/c33a564f81fc478db125bf08914a4585.png);
 }
 
-#elton-john {
-  background-image: url(http://img2-ak.lst.fm/i/u/6e9bdfb2663f4e78ae830ff1aa405c32.png);
+#stevie-wonder {
+  background-image: url(http://img2-ak.lst.fm/i/u/cee3aeee325113a675c12ba386c2fb44.png);
 }
 
-#madonna {
-  background-image: url(http://img2-ak.lst.fm/i/u/56278c78ce6f4e90cee58e2cc136140d.png);
+#michael-jackson {
+  background-image: url(http://img2-ak.lst.fm/i/u/82e02ad3303a4810ad3f6e1cfff9a14a.png);
 }
 
 #mariah-carey {
@@ -423,7 +405,7 @@ div.slider.slider-horizontal {
 }
 
 #rihanna {
-  background-image: url(http://img2-ak.lst.fm/i/u/6841be22a2e42c11f21fa490dd2dbb65.png);
+  background-image: url(http://img2-ak.lst.fm/i/u/d5db38e344da1e3405d9dba5cebb6171.png);
 }
 
 .img-col {
@@ -468,6 +450,74 @@ div.slider.slider-horizontal {
     opacity: .8;
     cursor: pointer;
     cursor: hand;
+}
+
+.decade-col{
+    width: 57px;
+    margin-right: 20px;
+    height: 100px;
+    margin-top: 5px;
+    font-size: xx-large;
+}
+
+@font-face {
+    font-family: 'Font60s'; /*a name to be used later*/
+    src: url('fonts/60s/victor-moscoso.regular.ttf'); /*URL to font*/
+}
+
+p._60s-label {
+  font-family: 'Font60s';
+  color: rgba(31, 119, 180, 0.5);
+}
+
+@font-face {
+    font-family: 'Font70s'; /*a name to be used later*/
+    src: url('fonts/70s/monoton.regular.ttf'); /*URL to font*/
+}
+
+p._70s-label {
+  font-family: 'Font70s';
+  color: rgba(255, 127, 14, 0.5);
+}
+
+@font-face {
+    font-family: 'Font80s'; /*a name to be used later*/
+    src: url('fonts/80s/videophreak.regular.ttf'); /*URL to font*/
+}
+
+p._80s-label {
+  font-family: 'Font80s';
+  color: rgba(44, 160, 44, 0.5);
+}
+
+@font-face {
+    font-family: 'Font90s'; /*a name to be used later*/
+    src: url('fonts/90s/sans-culottes.regular.ttf'); /*URL to font*/
+}
+
+p._90s-label {
+  font-family: 'Font90s';
+  color: rgba(214, 39, 40, 0.5);
+}
+
+@font-face {
+    font-family: 'Font00s'; /*a name to be used later*/
+    src: url('fonts/00s/neuropol_x_rg.ttf'); /*URL to font*/
+}
+
+p._00s-label {
+  font-family: 'Font00s';
+  color: rgba(148, 103, 189, 0.5);
+}
+
+@font-face {
+    font-family: 'Font10s'; /*a name to be used later*/
+    src: url('fonts/10s/hemi_head_bd_it.ttf'); /*URL to font*/
+}
+
+p._10s-label {
+  font-family: 'Font10s';
+  color: rgba(140, 86, 75, 0.5);
 }
 
 
