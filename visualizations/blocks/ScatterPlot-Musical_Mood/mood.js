@@ -4,16 +4,6 @@
 
  // Populates the dataset from a CSV file and creates the chart
  function createChart4(){
- 	/*var nbOfArtists = d3.select('#numberOfArtistsSelector')
-						.selectAll('.active')
-						.attr('data-val');
-
- 	nbOfArtists = parseInt(nbOfArtists);
-
- 	valueToDisplay = d3.select('#hotttnessOrFamiliaritySelector')
-						.selectAll('.active')
-						.attr('data-val');
-	setXValues(valueToDisplay);*/
 
  	// Populates the dataset from a CSV file and creates
 	d3.csv('billboard_df-final.csv', function(error, data) {
@@ -79,9 +69,7 @@ function createAverageLines(dataset){
      	.attr('y2', function() { return yScale4(mean_y); })
      	.attr('stroke-width', 2)
         .attr('class', 'all')
-        .style('display', 'block');
-
-	var decadeData = [];	
+        .style('display', 'block');	
 
 	decadeData['_60s'] = dataset.filter(function(d) { return d['Year'] < 1970; });
 	decadeData['_70s'] = dataset.filter(function(d) { return d['Year'] >= 1970 && d['Year'] < 1980; });
@@ -163,16 +151,33 @@ function updateCircles4(dataset) {
 		.attr('cy', function(d) {return yScale4(d['Energy']);})
 		.attr('r', radius4) 
 		.style('stroke-width', '1px');
-		//.style('stroke', '#656D78');
 
 	u.on('mouseover', function(d) {
 		var selectedCircle = d3.select(this);
-		if(selectedCircle.classed('tracksToDisplay')){				
+		if(selectedCircle.classed('tracksToDisplay')){			
 
 			selectedCircle.transition()
 				.duration(200)
 				.attr('r', hoveredRadius4)
-				.each("end", function(d){ return tip.show(d, this); });
+				.each("end", function(d){ 	
+					pauseIcon.style('display', 'none');
+					var r_glyph = +selectedCircle.attr('r');
+					var x_glyph = +selectedCircle.attr('cx') - r_glyph / 2;
+					var y_glyph = +selectedCircle.attr('cy') - r_glyph / 2;	
+					if(selectedCircle.classed('playing')){
+						playingIcon.style('display', 'none');
+						pauseIcon.attr("y", y_glyph)
+						   .attr("x", x_glyph)
+						   .style('display', 'block');
+					} 
+					else {
+						playIcon.attr("y", y_glyph)
+						   .attr("x", x_glyph)
+						   .style('display', 'block');
+					}
+					
+					return tip.show(d, this); 
+				});
 
 			selectedCircle.moveToFront();
 		}
@@ -185,13 +190,33 @@ function updateCircles4(dataset) {
 							.transition()
 							.duration(200);
 			
+			playIcon.style('display', 'none');
 			tip.hide(d);
 			selectedCircle.moveToBack();
+		}
+		else if(selectedCircle.classed('playing')){
+			var r_glyph = +selectedCircle.attr('r');
+			var x_glyph = +selectedCircle.attr('cx') - r_glyph / 2;
+			var y_glyph = +selectedCircle.attr('cy') - r_glyph / 2;	
+			pauseIcon.style('display', 'none');
+			playingIcon.attr("y", y_glyph)
+						.attr("x", x_glyph)
+						.style('display', 'block');
 		}		
 	});
 
 	u.on('click', function(d) {
 		var selectedCircle = d3.select(this);
+
+		playingIcon.style('display', 'none');
+		playIcon.style('display', 'none');
+		pauseIcon.style('display', 'none');
+
+		var playingItems = d3.selectAll('.playing');
+		playingItems.attr('r', radiusValues4['Big'])
+						.transition()
+						.duration(200);
+
 		if(selectedCircle.classed('tracksToDisplay')){	
 			spotifyApi.searchTracks(d['Lead Artist(s)'] + ' ' + d['Title'] , {limit: 1})
 				.then(function(data) {
@@ -201,16 +226,23 @@ function updateCircles4(dataset) {
 
 					var previewUrl = data.tracks.items[0].preview_url;
 
+					var r_glyph = +selectedCircle.attr('r');
+					var x_glyph = +selectedCircle.attr('cx') - r_glyph / 2;
+					var y_glyph = +selectedCircle.attr('cy') - r_glyph / 2;
+
 					if(previousUrl != previewUrl){
+						playingItems.classed('playing', false);
 						d3.select('#audio-player')
 							.selectAll('source').attr('src', previewUrl);
 
 						d3.select('#audio-player')[0][0].load();
-						d3.select('#audio-player')[0][0].play()
-														.then(function(){
-															pulse();
-														});
+						d3.select('#audio-player')[0][0].play();
 						selectedCircle.classed('playing', true);
+
+					    playingIcon.attr("y", y_glyph)
+					    		.attr("x", x_glyph)
+					    		.style('display', 'block');
+									 
 						d3.select('#audio-player').classed('active', true);
 						
 					} else {
@@ -218,18 +250,24 @@ function updateCircles4(dataset) {
 						d3.select('#audio-player').classed('active', !hasClass);
 
 						if(hasClass){
+							playingIcon.style('display', 'none');
 							d3.select('#audio-player')[0][0].pause();
 							selectedCircle.classed('playing', false);
+							selectedCircle.attr('r', radiusValues4['Big'])
+										.transition()
+										.duration(200);
 						} else {
-							d3.select('#audio-player')[0][0].play()
-															.then(function(){
-																pulse();
-															});
+							d3.select('#audio-player')[0][0].play();
 							selectedCircle.classed('playing', true);
+
+							playingIcon.attr("y", y_glyph)
+					    		.attr("x", x_glyph)
+					    		.style('display', 'block');
 						}
 					}
 
 					d3.select('#audio-player').on('ended', function(){
+						playingIcon.style('display', 'none');
 						selectedCircle.classed('playing', false);
 						selectedCircle.attr('r', radiusValues4['Big'])
 										.transition()
@@ -242,95 +280,6 @@ function updateCircles4(dataset) {
 		}
 	});
 
-	/*u.on('click', function(d) {
-		var selectedCircle = d3.select(this);
-		
-		var artistDetails = d3.select('div.artistDetails').style('display', 'block');
-
-		artistDetails.select('.artistNameTitle')
-			.text(d['Artist(s)']);
-
-		artistDetails.select('.artistNameImage')
-			.attr('src', d['Image URL']);
-
-		// Select the artist table
-		var artistTable = d3.select('.artistSongListDiv table');
-
-		// Clear the table body
-		artistTable.select('tbody').selectAll('tr').remove();
-
-		var newTableRow = null;
-		d['List of songs'].forEach(function(songObject, index){
-			spotifyApi.searchTracks(d['Artist(s)'] + ' ' + songObject.title, {limit: 1})
-				.then(function(data) {
-					newTableRow = artistTable.select('tbody').append('tr')
-							.attr('id', 'song-' + index)
-							.attr('class', 'song-row');
-
-					var previewUrl = data.tracks.items[0].preview_url;
-					newTableRow.append('td')
-						.text(songObject.title);
-					newTableRow.append('td')
-						.text(songObject.year);
-					newTableRow.append('td')
-						.text('#' + songObject.rank);
-					var playerCell = newTableRow.append('td');
-					var audioControls = playerCell.append('audio')
-						.attr('controls', '')
-						.attr('id', 'audio-' + index)
-						.on('ended', function() {
-					          d3.select(this).currentTime = 0;
-					          d3.select('#playDisplayButton-' + index).classed('active', false);
-					     });
-					audioControls.append('source')
-						.attr('src', previewUrl)
-						.attr('type', 'audio/mpeg');
-					audioControls.append('source')
-						.attr('src', previewUrl)
-						.attr('type', 'audio/ogg');
-					playerCell.append('button')
-						.attr('class', 'playDisplayButton')
-						.attr('id', 'playDisplayButton-' + index)
-						.on('click', function(){
-							var selectedID = d3.select(this).attr('id').split('playDisplayButton-')[1];
-							d3.selectAll('.playDisplayButton.active').each(function(){
-								var idToPause = d3.select(this).attr('id').split('playDisplayButton-')[1];
-								if(selectedID != idToPause){
-									d3.select(this).classed('active', false);
-									d3.select('#audio-' + idToPause)[0][0].pause();
-								}
-							});
-							hasClass = d3.select(this).classed('active');
-							d3.select(this).classed('active', !hasClass);
-							if(hasClass){
-								d3.select('#audio-' + index)[0][0].pause();
-							} else {
-								d3.select('#audio-' + index)[0][0].play();
-							}
-						});
-
-					if(songObject.rank == 1){
-						newTableRow.attr('class', 'success');
-					}
-				}, function(err) {
-					newTableRow = artistTable.select('tbody').append('tr')
-							.attr('id', 'song-' + index);
-					newTableRow.append('td')
-						.text(songObject.title);
-					newTableRow.append('td')
-						.text(songObject.year);
-					newTableRow.append('td')
-						.text('#' + songObject.rank);
-					newTableRow.append('td');
-
-					if(songObject.rank == 1){
-						newTableRow.attr('class', 'success');
-					}
-			});
-		});
-
-		goToByScroll('artistDetails');
-	});*/
 }
 
 
@@ -360,7 +309,6 @@ function createGridAxis4() {
 	gridXAxis4 = d3.svg.axis()
 			.scale(xScale4)
 			.orient('bottom')
-			.tickFormat(formatPercent4)
 			.ticks(5);
 
 	container4.select('.grids')
@@ -375,7 +323,6 @@ function createGridAxis4() {
 	gridYAxis4 = d3.svg.axis()
 			.scale(yScale4)
 			.orient('left')
-			.tickFormat(formatPercent4)
 			.ticks(5);
 
 	container4.select('.grids')
@@ -405,10 +352,6 @@ function createToolTip(){
 
 // Resize function which makes the graph responsive
 function resize4() {
-	/*valueToDisplay = d3.select('#hotttnessOrFamiliaritySelector')
-						.selectAll('.active')
-						.attr('data-val');
-	setXValues(valueToDisplay);*/
 
 	// Find the new window dimensions 
     var width4 = parseInt(d3.select('#chart4').style('width')) - margin4.left - margin4.right,
@@ -426,45 +369,63 @@ function resize4() {
 		hoveredRadius4 = hoveredRadiusValues4['Medium'];
 	} 
 
-	//var jitterIndex = 0;
 
 	// Update the range of the scales with new width/height
-	/*var xMax = d3.max(dataset, function(d) { return d[valueToDisplay]; });
-	var xMin = d3.min(dataset, function(d) { return d[valueToDisplay]; });
-	xScale = d3.scale.linear().domain([xMin - 0.02, xMax + 0.02]).range([0, width]);
-	yScale.range([height, 0]);*/
+	xScale4.range([0, width4]);
+	yScale4.range([height4, 0]);
 
 	// Update all the existing elements (gridlines, axis text, circles)
 	gridXAxis4.scale(xScale4);
 	gridYAxis4.scale(yScale4);
 
-	container4.select('#gridY4')
+	container4.select('#gridY')
 			.attr('transform', 'translate(0, '+height4+')')
 			.call(gridXAxis4.tickSize(-height4 - 15, 0, 0));
 
-	container4.select('#gridX4')
+	container4.select('#gridX')
 			.call(gridYAxis4.tickSize(-width4, 0, 0));
 
 	container4.select('.x.label')
 	    .attr('x', width4)
 	    .attr('y', height4 + 30);
 
-	container4.select('.y.label');
+	container4.selectAll('circle')
+		.attr('cx', function(d) {return xScale4(d['Valence']);})
+		.attr('cy', function(d) {return yScale4(d['Energy']);})
+		.attr('r', radius4); 
 
-	/* container4.selectAll('circle')
-		.transition()
-		.duration(1000)
-		.attr('cx', function(d) {
-			if(d3.select(this).classed('multipleArtists')){
-				var x_jitter = Math.pow(-1, jitterIndex) * jitter - Math.pow(-1, jitterIndex) * (jitter / 2);
-				jitterIndex++;
-				return xScale(d[valueToDisplay]) + x_jitter;
-			} else {
-				return xScale(d[valueToDisplay]);
-			}
-		})
-		.attr('cy', function(d) {return yScale(d['Dominance Max'].value);})
-		.attr('r', radius);*/
+	var mean_x = d3.mean(dataset4, function(d) { return +d['Valence']});
+	var mean_y = d3.mean(dataset4, function(d) { return +d['Energy']});	
+
+	container4.select('#mean_x_all')
+	     	.attr('x1', function() { return xScale4(mean_x); })
+	     	.attr('y1', function() { return yScale4(-0.01); })
+	     	.attr('x2', function() { return xScale4(mean_x); })
+	     	.attr('y2', function() { return yScale4(1.01); });
+
+	container4.select('#mean_y_all')
+     	.attr('x1', function() { return xScale4(-0.01); })
+     	.attr('y1', function() { return yScale4(mean_y); })
+     	.attr('x2', function() { return xScale4(1.01); })
+     	.attr('y2', function() { return yScale4(mean_y); });
+
+	for(var decade in decadeData){
+		mean_x = d3.mean(decadeData[decade], function(d) { return +d['Valence']});
+		mean_y = d3.mean(decadeData[decade], function(d) { return +d['Energy']});
+
+		container4.select('#mean_x' + decade)
+	     	.attr('x1', function() { return xScale4(mean_x); })
+	     	.attr('y1', function() { return yScale4(-0.01); })
+	     	.attr('x2', function() { return xScale4(mean_x); })
+	     	.attr('y2', function() { return yScale4(1.01); });
+
+		container4.select('#mean_y' + decade)
+	     	.attr('x1', function() { return xScale4(-0.01); })
+	     	.attr('y1', function() { return yScale4(mean_y); })
+	     	.attr('x2', function() { return xScale4(1.01); })
+	     	.attr('y2', function() { return yScale4(mean_y); });
+	}
+
 }
 
 function clearGraph(){
@@ -546,20 +507,6 @@ function decadeButtonsShowHideCircles(){
 		d3.select('.averageLines')
 			.selectAll('line.' + val).style('display', 'none');
 	});
-}
-
-function pulse() {
-	(function repeat() {
-		var selectedCircle = d3.select('.circles').selectAll('circle.playing');
-		selectedCircle = selectedCircle.transition()
-			.duration(2000)
-			.attr("r", radiusValues4['Big'])
-			.transition()
-			.duration(2000)
-			.attr("r", hoveredRadius4)
-			.ease('sine')
-			.each("end", repeat);
-	})();
 }
 
 /* **************************************************** *
@@ -722,29 +669,38 @@ d3.selectAll('.band-img').on('click', function(){
 	}	
 });
 
+var playingIcon = container4.select('.circles')
+						.append("svg:foreignObject")
+							.attr("width", 20)
+							.attr("height", 20)
+							.attr("id", "playingIcon")
+							.style('display', 'none');
+playingIcon.append("xhtml:span")
+		.attr("class", "control glyphicon glyphicon-volume-up");
 
+var playIcon = container4.select('.circles')
+						.append("svg:foreignObject")
+							.attr("width", 20)
+							.attr("height", 20)
+							.attr("id", "playIcon")
+							.style('display', 'none');
+playIcon.append("xhtml:span")
+		.attr("class", "control glyphicon glyphicon-play");
 
+var pauseIcon = container4.select('.circles')
+						.append("svg:foreignObject")
+							.attr("width", 20)
+							.attr("height", 20)
+							.attr("id", "pauseIcon")
+							.style('display', 'none');
+pauseIcon.append("xhtml:span")
+		.attr("class", "control glyphicon glyphicon-pause");
 
-// Close button for the artist details area
-/*d3.select('.close').on('click', function(){
-	goToByScroll('chart'); 
-	d3.select('.artistDetails').style('display', 'none'); 
-});
-
-// Slider 
-var sliderDateRange = new Slider('#dateRangeSlider');
-var dateRange = sliderDateRange.getValue();
-
-sliderDateRange.on('slideStop', function(){
-	dateRange = sliderDateRange.getValue();
-	clearGraph();
-	createChart();
-});
-*/
 // Instantiate Spotify wrapper
 var spotifyApi = new SpotifyWebApi();
 
 // Dataset init and chart creation
 var dataset4 = [];
+var decadeData = [];
 createChart4();
 

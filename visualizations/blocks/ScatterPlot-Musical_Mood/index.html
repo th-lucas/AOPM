@@ -11,7 +11,49 @@
 <body>
 	<div class='container'>
 		<div class='row top-buffer'>
-			<div class='col-md-12 decadeSelectorParent'>
+			<div class='col-md-1 col-sm-2 col-xs-2'>
+				<div class='img-col'>
+					<p class="_60s-label">60s</p>
+					<div id='the-beatles' class='band-img the-beatles grey-scale'></div>
+					<p class="band-text tk-futura-pt the-beatles">The Beatles</p>
+				</div>
+			</div>
+			<div class='col-md-1 col-sm-2 col-xs-2'>
+				<div class='img-col'>
+					<p class="_70s-label">70s</p>
+					<div id='stevie-wonder' class='band-img stevie-wonder grey-scale'></div>
+					<p class="band-text tk-futura-pt stevie-wonder">Stevie Wonder</p>
+				</div>
+			</div>
+			<div class='col-md-1 col-sm-2 col-xs-2'>
+				<div class='img-col'>
+					<p class="_80s-label">80s</p>
+					<div id='michael-jackson' class='band-img michael-jackson grey-scale'></div>
+					<p class="band-text tk-futura-pt michael-jackson">Michael Jackson</p>
+				</div>
+			</div>
+			<div class='col-md-1 col-sm-2 col-xs-2'>
+				<div class='img-col'>
+					<p class="_90s-label">90s</p>
+					<div id='mariah-carey' class='band-img mariah-carey grey-scale'></div>
+					<p class="band-text tk-futura-pt mariah-carey">Mariah Carey</p>
+				</div>
+			</div>
+			<div class='col-md-1 col-sm-2 col-xs-2'>
+				<div class='img-col'>
+					<p class="_00s-label">00s</p>
+					<div id='eminem' class='band-img eminem grey-scale'></div>
+					<p class="band-text tk-futura-pt eminem">Eminem</p>
+				</div>
+			</div>
+			<div class='col-md-1 col-sm-2 col-xs-2'>
+				<div class='img-col'>
+					<p class="_10s-label">10s</p>
+					<div id='rihanna' class='band-img rihanna grey-scale'></div>
+					<p class="band-text tk-futura-pt rihanna">Rihanna</p>
+				</div>
+			</div>
+			<div class='col-md-6 col-sm-12 col-xs-12 decadeSelectorParent'>
 				<div id='decadeSelector' class='btn-group' data-toggle="buttons">
 					<label class="btn btn-default btn-all active">
             			<input type="checkbox" name="decadeSelectorButton" id="btn-all" value="all">All
@@ -36,60 +78,10 @@
         			</label>
 				</div>
 			</div>
+
 		</div>
-		<div class='row'>
-			<div class='col-md-1 col-sm-1'>
-				<div class='representativeArtistsPeriodDiv'>
-					<div class='decade-col'>
-						<p class="_60s-label">60s</p>
-					</div>
-					<div class='decade-col'>
-						<p class="_70s-label">70s</p>
-					</div>
-					<div class='decade-col'>
-						<p class="_80s-label">80s</p>
-					</div>
-					<div class='decade-col'>
-						<p class="_90s-label">90s</p>
-					</div>
-					<div class='decade-col'>
-						<p class="_00s-label">00s</p>
-					</div>
-					<div class='decade-col'>
-						<p class="_10s-label">10s</p>
-					</div>
-				</div>
-			</div>
-			<div class='col-md-1 col-sm-1'>
-				<div class='representativeArtistsDiv'>
-					<div class='img-col'>
-						<div id='the-beatles' class='band-img the-beatles grey-scale'></div>
-						<p class="band-text tk-futura-pt the-beatles">The Beatles</p>
-					</div>
-					<div class='img-col'>
-						<div id='stevie-wonder' class='band-img stevie-wonder grey-scale'></div>
-						<p class="band-text tk-futura-pt stevie-wonder">Stevie Wonder</p>
-					</div>
-					<div class='img-col'>
-						<div id='michael-jackson' class='band-img michael-jackson grey-scale'></div>
-						<p class="band-text tk-futura-pt michael-jackson">Michael Jackson</p>
-					</div>
-					<div class='img-col'>
-						<div id='mariah-carey' class='band-img mariah-carey grey-scale'></div>
-						<p class="band-text tk-futura-pt mariah-carey">Mariah Carey</p>
-					</div>
-					<div class='img-col'>
-						<div id='eminem' class='band-img eminem grey-scale'></div>
-						<p class="band-text tk-futura-pt eminem">Eminem</p>
-					</div>
-					<div class='img-col'>
-						<div id='rihanna' class='band-img rihanna grey-scale'></div>
-						<p class="band-text tk-futura-pt rihanna">Rihanna</p>
-					</div>
-				</div>
-			</div>
-			
-			<div class='col-md-10 col-sm-10'>
+		<div class="row">
+			<div class='col-md-12 col-sm-12'>
 				<div class='chart-container-col'>
 					<! -- Non data-driven elements -->
 					<svg id='chart4'>
@@ -112,54 +104,6 @@
 		</div>
 	</div>
 	
-	
-	
-	<div class='container bottom-buffer'>
-		<!--<div class="row">
-			<div class="col-md-8 col-sm-8 col-md-offset-2 col-sm-offset-2">
-				<span class="slider-label">1960</span> 
-				<input id="dateRangeSlider" type="text" value="" data-slider-min="1960" data-slider-max="2015" data-slider-step="1" data-slider-value="[1960, 2015]"/> 
-				<span class="slider-label">2015</span> 
-			</div>
-		</div>-->
-		<div class='row'>
-			<div class='col-md-12'>
-				<div class='bs-callout bs-callout-info artistDetails' id='artistDetails'>
-					<button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-					<div class='row'>
-						<div class='col-md-2 col-sm-4 col-xs-4'>
-							<div class='artistNameImageDiv'>
-								<img class='artistNameImage img-thumbnail img-responsive'>
-							</div>
-						</div>
-						<div class='col-md-10 col-sm-8 col-xs-8'>
-							<div class='artistNameTitleDiv'>
-								<h3 class='artistNameTitle'></h3>
-							</div>
-						</div>
-
-					</div>
-					<div class='row'>
-						<div class='col-md-12'>
-							<div class='artistSongListDiv'>
-								<table class='table table-hover'>
-									<thead>
-										<tr>
-											<th>Song Title</th>
-											<th>Year</th>
-											<th>Rank</th>
-											<th>Track Preview</th>
-										</tr>
-									</thead>
-									<tbody></tbody>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>	
 
 	<!-- Scripts-->
 	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>

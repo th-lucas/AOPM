@@ -84,8 +84,29 @@ div.chart-container-col {
   min-height: 90vh;
 }
 
-div.numberOfArtistsSelectorParent, div.decadeSelectorParent {
+div.numberOfArtistsSelectorParent {
   text-align: right;
+}
+
+@media (min-width: 992px){
+  div.decadeSelectorParent {
+    position: relative;
+    transform: translateY(120%);
+    text-align: right;
+  }
+}
+
+@media (max-width: 992px){
+  div.decadeSelectorParent {
+    text-align: center;
+    position: inherit;
+    transform: inherit;
+    margin-top: 20px;
+  }
+}
+
+#decadeSelector .btn {
+  width: 65px;
 }
 
 div.bs-callout {
@@ -411,6 +432,8 @@ div.slider.slider-horizontal {
 .img-col {
   margin-right: 20px;
   width: 57px;
+  text-align: center;
+  font-size: large;
 }
 
 .grey-scale {
@@ -520,4 +543,10 @@ p._10s-label {
   color: rgba(140, 86, 75, 0.5);
 }
 
+.control.glyphicon {
+  position: static;
+  font-size: x-large;
+  margin-left: 4px;
+  margin-top: 4px;
+}
 
