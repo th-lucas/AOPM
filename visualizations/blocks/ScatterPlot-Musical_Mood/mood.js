@@ -531,10 +531,7 @@ var hoveredRadiusValues4 = {'Small': 22, 'Medium': 30, 'Big': 40};
 
 var radius4 = null;
 var hoveredRadius4 = null;
-if(((width4 + margin4.left + margin4.right) >= 1500) && ((height4 + margin4.top + margin4.bottom) >= 700)){
-	radius4 = radiusValues4['Big'];
-	hoveredRadius4 = hoveredRadiusValues4['Big'];
-} else if (((width4 + margin4.left + margin4.right) <= 500) && ((height4 + margin4.top + margin4.bottom) <= 400)){
+if (((width4 + margin4.left + margin4.right) <= 500) && ((height4 + margin4.top + margin4.bottom) <= 400)){
 	radius4 = radiusValues4['Small'];
 	hoveredRadius4 = hoveredRadiusValues4['Small'];
 } 
