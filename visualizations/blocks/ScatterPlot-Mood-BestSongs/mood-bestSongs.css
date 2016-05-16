@@ -22,7 +22,7 @@
     margin: 0 auto;
 }
 
-#chart, #chart2, #chart4 {
+#chart, #chart2, #chart4, #chart5 {
   background-color: #f7f7f9; 
   width: 95%;
   height: 95%;
@@ -75,7 +75,7 @@ div.artistDetails {
 div.chart-container {
   position: relative;
   min-height: 90vh;
-  /*min-width: 90vw;*/
+  min-width: 90vw;
   /*margin-left: -17.5vw;*/
 }
 
@@ -173,7 +173,7 @@ table#importantDatesTable tbody tr:hover {
   cursor: pointer;
 }
 
-circle._60s {
+/*circle._60s {
   fill: rgba(31, 119, 180, 0.5);
 }
 
@@ -195,7 +195,7 @@ circle._00s {
 
 circle._10s {
   fill: rgba(140, 86, 75, 0.5);
-}
+}*/
 
 line.all {
   stroke: rgba(101, 109, 120, 0.8);

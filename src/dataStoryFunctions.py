@@ -10,12 +10,15 @@ import matplotlib.ticker as mtick
 import scipy.stats as sstats
 import time
 import re
+import numpy as np
 
 from matplotlib import gridspec
 from pyechonest import config
 from pyechonest import song
 from pyechonest import artist
 from pandas.io.json import json_normalize
+
+from sklearn.neighbors import NearestNeighbors
 
 # Geopy
 from geopy.geocoders import Nominatim
@@ -1279,6 +1282,104 @@ def create_valence_vs_energy_scatter_plot_per_decade(billboard_df_final):
 		plt.plot(energy_major_mean_coords[0], energy_major_mean_coords[1], color = "black")
 
 		gs.update(wspace=0.2, hspace=0.3)
+
+
+def create_best_songs_of_all_time_df(best_songs_of_all_time, last_fm_network, billboard_df_final):
+    best_songs_of_all_time_df = pd.DataFrame(best_songs_of_all_time) 
+    best_songs_of_all_time_df["danceability"] = ""
+    best_songs_of_all_time_df["energy"] = ""
+    best_songs_of_all_time_df["loudness"] = ""
+    best_songs_of_all_time_df["tempo"] = ""
+    best_songs_of_all_time_df["valence"] = ""
+    best_songs_of_all_time_df["image_url"] = ""
+    best_songs_of_all_time_df["in_billboard"] = ""
+    best_songs_of_all_time_df["in_billboard_index"] = ""
+
+    # Copy and re-index
+    billboard_df_final_cleaned = pd.DataFrame.copy(billboard_df_final)
+    index_to_remove = billboard_df_final_cleaned.index[billboard_df_final_cleaned['valence'].apply(np.isnan)]
+    billboard_df_final_cleaned = billboard_df_final_cleaned.drop(billboard_df_final_cleaned.index[index_to_remove])
+    index_to_remove = billboard_df_final_cleaned.index[billboard_df_final_cleaned['energy'].apply(np.isnan)]
+    billboard_df_final_cleaned = billboard_df_final_cleaned.drop(billboard_df_final_cleaned.index[index_to_remove])
+    billboard_df_final_cleaned = billboard_df_final_cleaned.set_index([range(len(billboard_df_final_cleaned))])
+
+    for index_artist, item in enumerate(best_songs_of_all_time):
+        if len(billboard_df_final[(billboard_df_final['Artist(s)'] == item['artist']) & (billboard_df_final['Title'] == item['title'])]) > 0:
+            best_songs_of_all_time_df.loc[index_artist, "in_billboard"] = "Yes"
+
+            index_to_remove = billboard_df_final_cleaned[(billboard_df_final_cleaned['Artist(s)'] == item['artist']) & (billboard_df_final_cleaned['Title'] == item['title'])].index.tolist()
+            billboard_df_final_cleaned = billboard_df_final_cleaned.drop(billboard_df_final_cleaned.index[index_to_remove])
+            
+            index_in_real_dataset = billboard_df_final[(billboard_df_final['Artist(s)'] == item['artist']) & (billboard_df_final['Title'] == item['title'])].index.tolist()
+            best_songs_of_all_time_df.loc[index_artist, "in_billboard_index"] = str(index_in_real_dataset)
+            
+        else:
+            best_songs_of_all_time_df.loc[index_artist, "in_billboard"] = "No"
+
+        try: 
+            # EchoNest API
+            results = song.search(artist = item['artist'], title = item['title'], 
+                                    buckets=[ 'audio_summary', 'song_type', 'song_discovery'])
+            current_song = results[0]
+
+            if current_song.audio_summary:
+                best_songs_of_all_time_df.loc[index_artist, "danceability"] = current_song.audio_summary["danceability"]
+                best_songs_of_all_time_df.loc[index_artist, "energy"] = current_song.audio_summary["energy"]
+                best_songs_of_all_time_df.loc[index_artist, "loudness"] = current_song.audio_summary["loudness"]
+                best_songs_of_all_time_df.loc[index_artist, "tempo"] = current_song.audio_summary["tempo"]
+                best_songs_of_all_time_df.loc[index_artist, "valence"] = current_song.audio_summary["valence"]
+
+            # Last FM API
+            track_object = last_fm_network.get_track(item['artist'], item['title'])
+            album = track_object.get_album()
+            image_url = album.get_cover_image()
+            best_songs_of_all_time_df.loc[index_artist, "image_url"] = image_url
+
+        except:
+            print "Failed:", item
+            continue
+
+    billboard_df_final_cleaned = billboard_df_final_cleaned.set_index([range(len(billboard_df_final_cleaned))])
+    return best_songs_of_all_time_df, billboard_df_final_cleaned
+
+
+def find_similar_songs(best_songs_of_all_time_df, billboard_df_final_cleaned, features_array):
+    to_predict = best_songs_of_all_time_df[features_array]
+    samples = billboard_df_final_cleaned[features_array]
+
+    # Similarity search
+    n_neighbors = 5
+    neigh = NearestNeighbors(n_neighbors=n_neighbors, n_jobs=-1)
+    neigh = neigh.fit(samples.values) 
+    distances, indices = neigh.kneighbors(to_predict.values)
+
+    # Adding the new items to the best_songs_of_all_time_df
+    for i in range(1, n_neighbors):
+        best_songs_of_all_time_df['similar artist ' + str(i)] = ''
+        best_songs_of_all_time_df['similar song ' + str(i)] = ''
+        for j in features_array:
+            best_songs_of_all_time_df[str(j) + ' similar song ' + str(i)] = ''
+        best_songs_of_all_time_df['year similar song ' + str(i)] = ''
+        best_songs_of_all_time_df['distance ' + str(i)] = ''
+
+    for index_song, array_of_index in enumerate(indices):
+        for index_neighbor, neighbor in enumerate(array_of_index):
+            best_songs_of_all_time_df.loc[index_song, 'similar artist ' + str(index_neighbor +  1)] = billboard_df_final_cleaned.loc[neighbor, 'Artist(s)']
+            best_songs_of_all_time_df.loc[index_song, 'similar song ' + str(index_neighbor + 1)] = billboard_df_final_cleaned.loc[neighbor, 'Title']
+            for j in features_array:
+                best_songs_of_all_time_df.loc[index_song, str(j) + ' similar song ' + str(index_neighbor + 1)] = billboard_df_final_cleaned.loc[neighbor, str(j)]
+            best_songs_of_all_time_df.loc[index_song, 'year similar song ' + str(index_neighbor + 1)] = billboard_df_final_cleaned.loc[neighbor, 'Year']
+            best_songs_of_all_time_df.loc[index_song, 'distance ' + str(index_neighbor + 1)] = distances[index_song][index_neighbor]
+
+    return best_songs_of_all_time_df       
+   
+
+
+
+
+
+
+
 
 
 

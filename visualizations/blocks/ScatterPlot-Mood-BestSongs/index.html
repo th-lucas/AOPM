@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<head>
+	<title>Billboard Hot 100: Musical Mood</title>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="mood-bestSongs.css">
+
+</head>
+
+<body>
+
+	<div class='chart-container-col'>
+			<! -- Non data-driven elements -->
+			<svg id='chart5'>
+				<g id='chart-wrapper5' class='chart-wrapper'>
+				<g class='x axis'> </g>
+				<g class='y axis'> </g>
+				<g class='grids'></g>
+				<g class='circles'>
+					<g class='defs'></g>
+				</g>
+			</g>
+		</svg>
+		<div class='audio-player-div'>
+			<audio controls id='audio-player-best'>
+				<source class='mpeg' src='' type='audio/mpeg'>
+				<source src='' type='audio/ogg'>
+			</audio>
+		</div>
+	</div>
+	
+
+	<!-- Scripts-->
+	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script src="https://cdn.rawgit.com/JMPerez/spotify-web-api-js/master/src/spotify-web-api.js"></script>
+	<script src="mood-bestSongs.js"></script>
+		
+</body>
+</html>
