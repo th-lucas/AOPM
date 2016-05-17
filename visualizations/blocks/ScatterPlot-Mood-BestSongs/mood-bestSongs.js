@@ -142,9 +142,49 @@ function updatePatterns(dataset5) {
 	p.exit().remove();	
 }
 
+function tick(e) {
+	console.log(e.alpha);
+	node.each(moveTowardCategoryCenter());
+
+  	node.attr("cx", function(d) { return xScale5(d['Valence']); })
+    	.attr("cy", function(d) { return yScale5(d['Energy']); });
+}
+
+function charge(d) {
+  return d['Distance'] * d['Distance'] * -0.25;
+}
+
+function moveTowardCategoryCenter() {
+  return function(d) {
+  	var clusterIndex = d['Cluster index'];
+  	if(typeof clusterIndex !== 'undefined'){
+  		var center = clusterCenterCoords[clusterIndex];
+
+	    d['Valence'] += (center['Valence'] - d['Valence']) * 0.1;
+	    d['Energy'] += (center['Energy'] - d['Energy']) * 0.1; 
+	}
+    
+  };
+}
+
 // Update loop for the circles
 function updateCircles5(dataset, clusters) {
-	var u = container5
+	var force = d3.layout.force()
+        .nodes(dataset)
+        .size([width5, height5])
+        .on("tick", tick)
+        .charge(charge);
+
+    force.start();
+
+    node = container5.select('.circles')
+    			.selectAll("circle")
+			    .data(force.nodes())
+			    .enter().append("circle")
+			    .style("fill", "steelblue")
+			    .attr("r", 10);
+
+	/*var u = container5
 		.select('.circles')
 		.selectAll('circle')
 		.data(dataset);
@@ -248,7 +288,7 @@ return xScale5(d['Energy']);
 			.attr('r', hoveredRadius5)
 			.each("end", function(d){ return tip5.show(d, this); });
 
-		selectedCircle.moveToFront();		
+		selectedCircle.moveToFront();		*/
 
 /*
 		var selectedCircle = d3.select(this);
@@ -279,9 +319,9 @@ return xScale5(d['Energy']);
 
 			selectedCircle.moveToFront();
 		}*/
-	});
+	/*});
 
-	u.on('mouseout', function(d) {
+	u.on('mouseout', function(d) {*/
 		/*var selectedCircle = d3.select(this);
 		if(selectedCircle.classed('tracksToDisplay') && !(selectedCircle.classed('playing'))){		
 			selectedCircle.attr('r', radiusValues5['Big'])
@@ -301,7 +341,7 @@ return xScale5(d['Energy']);
 						.attr("x", x_glyph)
 						.style('display', 'block');
 		}	*/
-		var selectedCircle = d3.select(this);
+		/*var selectedCircle = d3.select(this);
 		
 		var allCircles = container5.selectAll('circle')
 						.style('opacity', 1);
@@ -387,7 +427,9 @@ return xScale5(d['Energy']);
 					});
 				});
 		}
-	});
+	});*/
+
+
 
 }
 
@@ -818,5 +860,6 @@ var dataset5 = [];
 var clusters = [];
 var clusterCenterCoords = [];
 var decadeData = [];
+var node;
 createChart5();
 
