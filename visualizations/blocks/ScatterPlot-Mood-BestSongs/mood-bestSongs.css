@@ -22,7 +22,22 @@
     margin: 0 auto;
 }
 
-#chart, #chart2, #chart4, #chart5 {
+#chart5 {
+  background-color: #f7f7f9; 
+  width: 95%;
+  height: 82%;
+  min-width: 400px;
+  min-height: 300px;
+  right: 2.5%;
+  left: 2.5%;
+  top: 2.5%;
+  bottom: 2.5%;
+  border-color: #ddd;
+  border-width: 1px;
+  border-radius: 4px;
+}
+
+#chart, #chart2, #chart4 {
   background-color: #f7f7f9; 
   width: 95%;
   height: 95%;
@@ -76,12 +91,13 @@ div.chart-container {
   position: relative;
   min-height: 90vh;
   min-width: 90vw;
-  /*margin-left: -17.5vw;*/
+  margin-left: -17.5vw;
 }
 
 div.chart-container-col {
-  position: relative;
+  /*position: relative;
   min-height: 90vh;
+  */
 }
 
 div.numberOfArtistsSelectorParent {
@@ -548,5 +564,105 @@ p._10s-label {
   font-size: x-large;
   margin-left: 4px;
   margin-top: 4px;
+}
+
+/* Similarity graph */ 
+
+.node {
+  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #bbb;
+}
+
+.node:hover {
+  fill: #000;
+  cursor: pointer;
+}
+
+.link {
+  stroke: #bbb;
+  stroke-opacity: .4;
+  fill: none;
+  pointer-events: none;
+}
+
+.node:hover,
+.node--source,
+.node--target {
+  font-weight: 700;
+  opacity: 1;
+}
+
+.node--source {
+  fill: #2ca02c;
+}
+
+.node--target {
+  fill: #d62728;
+}
+
+.link--source,
+.link--target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+
+.link--source {
+  stroke: #d62728;
+}
+
+.link--target {
+  stroke: #2ca02c;
+}
+
+
+text._60s.node {
+  font-family: 'Font60s';
+  fill: rgba(31, 119, 180, 0.8);
+  font-size: 14px;
+}
+
+text._70s.node {
+  font-family: 'Font70s';
+  fill: rgba(255, 127, 14, 0.5);
+}
+
+text._80s.node {
+  font-family: 'Font80s';
+  fill: rgba(44, 160, 44, 0.5);
+}
+
+
+text._90s.node {
+  font-family: 'Font90s';
+  fill: rgba(214, 39, 40, 0.5);
+}
+
+text._00s.node {
+  font-family: 'Font00s';
+  fill: rgba(148, 103, 189, 0.5);
+}
+
+text._10s.node {
+  font-family: 'Font10s';
+  fill: rgba(140, 86, 75, 0.5);
+}
+
+text.bestSongs.node {
+  font-size: 13px;
+}
+
+.svg-container {
+    display: inline-block;
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* aspect ratio */
+    vertical-align: top;
+    overflow: hidden;
+}
+.svg-content-responsive {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    left: 0;
 }
 
