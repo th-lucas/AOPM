@@ -550,3 +550,36 @@ p._10s-label {
   margin-top: 4px;
 }
 
+g.bestSongsCircles {
+  display: none;
+}
+
+#chart4 g.bestSongsCircles circle.bestSongs:hover {
+  cursor: pointer;
+}
+
+@font-face {
+    font-family: 'FontBestSongs'; /*a name to be used later*/
+    src: url('fonts/good-times.regular.ttf'); /*URL to font*/
+}
+
+button.bestSongsButton {
+  font-family: 'FontBestSongs';
+}
+
+@media (min-width: 992px){
+  div.bestSongsButtonDiv {
+    position: relative;
+    text-align: right;
+  }
+}
+
+@media (max-width: 992px){
+  div.bestSongsButtonDiv {
+    text-align: center;
+    position: inherit;
+    transform: inherit;
+    margin-top: 20px;
+  }
+}
+

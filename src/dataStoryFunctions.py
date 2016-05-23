@@ -1309,10 +1309,11 @@ def create_best_songs_of_all_time_df(best_songs_of_all_time, last_fm_network, bi
 
             index_to_remove = billboard_df_final_cleaned[(billboard_df_final_cleaned['Artist(s)'] == item['artist']) & (billboard_df_final_cleaned['Title'] == item['title'])].index.tolist()
             billboard_df_final_cleaned = billboard_df_final_cleaned.drop(billboard_df_final_cleaned.index[index_to_remove])
-            
+
             index_in_real_dataset = billboard_df_final[(billboard_df_final['Artist(s)'] == item['artist']) & (billboard_df_final['Title'] == item['title'])].index.tolist()
             best_songs_of_all_time_df.loc[index_artist, "in_billboard_index"] = str(index_in_real_dataset)
             
+            billboard_df_final_cleaned = billboard_df_final_cleaned.set_index([range(len(billboard_df_final_cleaned))])
         else:
             best_songs_of_all_time_df.loc[index_artist, "in_billboard"] = "No"
 

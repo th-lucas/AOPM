@@ -41,7 +41,6 @@
 		nodes = cluster.nodes(packageHierarchy(classes));
 		links = packageImports(nodes);
 
-
 		link.data(bundle(links))
 			    .enter().append("path")
 			      .each(function(d) { d.source = d[0], d.target = d[d.length - 1]; })

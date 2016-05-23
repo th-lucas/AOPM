@@ -21,25 +21,50 @@
 			};
 		});
 
-		// Scales
-		xScale4 = d3.scale.linear().domain([-0.01, 1.01]).range([0, width4]);
-		yScale4 = d3.scale.linear().domain([-0.01, 1.01]).range([height4, 0]);
+		d3.csv('best_songs_of_all_time.csv', function(error, data) {
+			if(error){ 
+				throw error;
+			}
 
-		// Chart creation
+			var bestSongs = data.map(function(d, index) { 
+				return {
+					'Year': +d['year'],
+					'Energy': +d['energy'],
+					'Valence': +d['valence'],
+					'Artist(s)': d['artist'],
+					'Title': d['title'],
+					'Lead Artist(s)': d['artist'],
+					'Image URL': d['image_url'],
+					'Class': 'bestSongs'
+				};
+			});
 
-		// Tooltip creation			
-		createToolTip();
-		// Axis label creation		
-		createAxesLabels4();
-		// Gridlines creation
-		createGridAxis4();
-		// Average lines creation
-		createAverageLines(dataset4);
-		// Circles creation
-		updateCircles4(dataset4);
-		// Resize
-		d3.select(window).on('resize', resize4); 
-		resize4();
+			// Scales
+			xScale4 = d3.scale.linear().domain([-0.01, 1.01]).range([0, width4]);
+			yScale4 = d3.scale.linear().domain([-0.01, 1.01]).range([height4, 0]);
+
+			// Chart creation
+
+			// Tooltip creation			
+			createToolTip();
+			// Axis label creation		
+			createAxesLabels4();
+			// Gridlines creation
+			createGridAxis4();
+			// Average lines creation
+			createAverageLines(dataset4);
+			// Circles creation
+			updateCircles4(dataset4);
+
+			// Image circle creation
+			updatePatterns(bestSongs);
+			// Best songs circles creation
+			updateBestSongs(bestSongs);
+
+			// Resize
+			d3.select(window).on('resize', resize4); 
+			resize4();
+		});
 	});
 }
 
@@ -105,6 +130,142 @@ function createAverageLines(dataset){
 	        .style('display', 'none');
 	}
 		
+}
+
+// Update loop which builds the patterns elements (used to display the artist images)
+function updatePatterns(bestSongs) {
+	var p = container4
+		.select('.defs')
+		.selectAll('pattern')
+		.data(bestSongs);  
+
+	p.enter()
+		.append('pattern')
+		.attr('id', function(d) { 
+			d['Artist'] = d['Artist(s)'].replace("'", "");
+			return camelize(d['Artist']) + '-img'
+		})
+		.attr('patternContentUnits', 'objectBoundingBox')
+		.attr('height', '100%')
+		.attr('width', '100%')
+			.append('image')
+			.attr('width', '1')
+			.attr('height', '1')
+			.attr('preserveAspectRatio', 'none') // xMidYMid slice
+			.attr('xlink:href', function(d) {return d['Image URL'];});
+
+	p.exit().remove();	
+}
+
+// Update loop for the best songs circles
+function updateBestSongs(bestSongs) {
+	var u = container4
+		.select('.bestSongsCircles')
+		.selectAll('circle')
+		.data(bestSongs);
+
+	u.enter()
+		.append('circle')
+		.attr('class', function(d) {return d['Class'];})
+		.attr('cx', function(d) {
+			return xScale4(d['Valence']);
+		})
+		.attr('cy', function(d) {
+			return yScale4(d['Energy']);
+		})
+		.attr('r', radiusBestSongs4) 
+		.style('stroke-width', '2px')
+		.style('stroke', '#656D78')
+		.style('fill', function(d, i) {
+			return 'url(#' + camelize(d['Artist']) + '-img)';	
+		});
+
+	u.exit().remove();
+
+	u.on('mouseover', function(d) {
+		var selectedCircle = d3.select(this);
+		
+		selectedCircle.transition()
+			.duration(200)
+			.attr('r', hoveredRadius4)
+			.each("end", function(d){ 	
+				return tip4.show(d, this); 
+			});
+		selectedCircle.moveToFront();
+
+	});
+
+	u.on('mouseout', function(d) {
+		var selectedCircle = d3.select(this);
+		if(!(selectedCircle.classed('playing'))){		
+			selectedCircle.attr('r', radiusBestSongs4)
+							.transition()
+							.duration(200);
+			
+			tip4.hide(d);
+			selectedCircle.moveToBack();
+		}	
+	});
+
+	u.on('click', function(d) {
+		var selectedCircle = d3.select(this);
+
+		playingIcon.style('display', 'none');
+		playIcon.style('display', 'none');
+		pauseIcon.style('display', 'none');
+
+		var playingItems = d3.selectAll('.playing');
+		playingItems.attr('r', radiusBestSongs4)
+						.transition()
+						.duration(200);
+	
+		spotifyApi.searchTracks(d['Artist'] + ' ' + d['Title'] , {limit: 1})
+			.then(function(data) {
+				var previousUrl = d3.select('#audio-player')
+									.select('source.mpeg')
+									.attr('src');
+
+				var previewUrl = data.tracks.items[0].preview_url;
+
+				if(previousUrl != previewUrl){
+					playingItems.classed('playing', false);
+					d3.select('#audio-player')
+						.selectAll('source').attr('src', previewUrl);
+
+					d3.select('#audio-player')[0][0].load();
+					d3.select('#audio-player')[0][0].play();
+					selectedCircle.classed('playing', true);
+								 
+					d3.select('#audio-player').classed('active', true);
+					
+				} else {
+					var hasClass = d3.select('#audio-player').classed('active');
+					d3.select('#audio-player').classed('active', !hasClass);
+
+					if(hasClass){
+						d3.select('#audio-player')[0][0].pause();
+						selectedCircle.classed('playing', false);
+						selectedCircle.attr('r', radiusBestSongs4)
+									.transition()
+									.duration(200);
+					} else {
+						d3.select('#audio-player')[0][0].play();
+						selectedCircle.classed('playing', true);
+					}
+				}
+
+				d3.select('#audio-player').on('ended', function(){
+					selectedCircle.classed('playing', false);
+					selectedCircle.attr('r', radiusBestSongs4)
+									.transition()
+									.duration(200);
+		
+					tip4.hide(d);
+					selectedCircle.moveToBack();
+				});
+			});
+	});
+
 }
 
 // Update loop for the circles
@@ -176,7 +337,7 @@ function updateCircles4(dataset) {
 						   .style('display', 'block');
 					}
 					
-					return tip.show(d, this); 
+					return tip4.show(d, this); 
 				});
 
 			selectedCircle.moveToFront();
@@ -191,7 +352,7 @@ function updateCircles4(dataset) {
 							.duration(200);
 			
 			playIcon.style('display', 'none');
-			tip.hide(d);
+			tip4.hide(d);
 			selectedCircle.moveToBack();
 		}
 		else if(selectedCircle.classed('playing')){
@@ -336,7 +497,7 @@ function createGridAxis4() {
 
 // Tooltip creation (uses the .tip() function from the d3-tip js library)
 function createToolTip(){
-	tip = d3.tip()
+	tip4 = d3.tip()
 	    .attr('class', 'd3-tip')
 	    .offset([-10, 0])
 	    .html(function(d) {
@@ -347,7 +508,7 @@ function createToolTip(){
 			     "<div><span>Energy:</span> <span class='tooltipContents'>" + d['Energy']+ "</span></div>";
 		});
 
-	container4.call(tip);
+	container4.call(tip4);
 }
 
 // Resize function which makes the graph responsive
@@ -389,10 +550,15 @@ function resize4() {
 	    .attr('x', width4)
 	    .attr('y', height4 + 30);
 
-	container4.selectAll('circle')
+	container4.select('.circles').selectAll('circle')
 		.attr('cx', function(d) {return xScale4(d['Valence']);})
 		.attr('cy', function(d) {return yScale4(d['Energy']);})
 		.attr('r', radius4); 
+
+	container4.select('.bestSongsCircles').selectAll('circle')
+		.attr('cx', function(d) {return xScale4(d['Valence']);})
+		.attr('cy', function(d) {return yScale4(d['Energy']);})
+		.attr('r', radiusBestSongs4); 
 
 	var mean_x = d3.mean(dataset4, function(d) { return +d['Valence']});
 	var mean_y = d3.mean(dataset4, function(d) { return +d['Energy']});	
@@ -529,18 +695,26 @@ var container4 = svg4.select('g.chart-wrapper')
 var radiusValues4 = {'Small': 2, 'Medium': 4, 'Big': 6};
 var hoveredRadiusValues4 = {'Small': 22, 'Medium': 30, 'Big': 40};
 
+var radiusBestSongsValues4 = {'Small': 12, 'Medium': 17, 'Big': 30};
+
 var radius4 = null;
 var hoveredRadius4 = null;
+var radiusBestSongs4 = null;
 if (((width4 + margin4.left + margin4.right) <= 500) && ((height4 + margin4.top + margin4.bottom) <= 400)){
 	radius4 = radiusValues4['Small'];
 	hoveredRadius4 = hoveredRadiusValues4['Small'];
+	radiusBestSongs4 = radiusBestSongsValues4['Small'];
+} 
+else if(((width4 + margin4.left + margin4.right) >= 1500) && ((height4 + margin4.top + margin4.bottom) >= 700)){
+	radiusBestSongs4 = radiusBestSongsValues4['Big'];
+	radius4 = radiusValues4['Medium'];
+	hoveredRadius4 = hoveredRadiusValues4['Medium'];
 } 
 else {
 	radius4 = radiusValues4['Medium'];
 	hoveredRadius4 = hoveredRadiusValues4['Medium'];
+	radiusBestSongs4 = radiusBestSongsValues4['Medium'];
 } 
-
-//var jitter = 10;
 
 // Scales
 var xScale4 = null;
@@ -560,6 +734,18 @@ var decadeButtons = d3.select('#decadeSelector')
 						.selectAll('label:not(.btn-all)');
 
 decadeButtons.on('click', function(){ 
+	var bestSongsButton = d3.select('#bestSongsButton');
+	if(bestSongsButton.classed('active')){
+		bestSongsButton.classed('active', false);
+		container4.select('.circles')
+					.selectAll('circle')
+					.style('display', 'block');
+		container4.select('.bestSongsCircles')
+					.style('display', 'none')
+					.selectAll('circle')
+					.style('display', 'none');
+	}
+
 	d3.select('.btn-all').classed('active', false);
 	d3.select('.averageLines')
 			.selectAll('line.all').style('display', 'none');
@@ -580,6 +766,7 @@ decadeButtons.on('click', function(){
 	d3.select('#decadeSelector').selectAll('label:not(.active_bis)').classed('inactive', true);
 	
 	decadeButtonsShowHideCircles();
+	bestSongsButton.attr('disabled', true);
 	
 });
 
@@ -587,6 +774,18 @@ var allButton = d3.select('#decadeSelector')
 						.select('.btn-all');
 
 allButton.on('click', function(){ 
+	var bestSongsButton = d3.select('#bestSongsButton');
+	if(bestSongsButton.classed('active')){
+		bestSongsButton.classed('active', false);
+		container4.select('.circles')
+					.selectAll('circle')
+					.style('display', 'block');
+		container4.select('.bestSongsCircles')
+					.style('display', 'none')
+					.selectAll('circle')
+					.style('display', 'none');
+	}
+
 	decadeButtons.classed('inactive', false);
 	decadeButtons.classed('active_bis', false);
 	decadeButtons.classed('active', false);
@@ -599,15 +798,23 @@ allButton.on('click', function(){
 			.attr('r', radius4);
 
 	if(d3.select(this).classed('active')){
+		d3.select(this).classed('inactive', true);
+		d3.select(this).classed('active', false);
+		d3.select(this).classed('active_bis', false);
 		d3.select('.circles')
 			.selectAll('circle').style('opacity', 0);
 		d3.select('.averageLines')
 			.selectAll('line.all').style('display', 'none');
+		bestSongsButton.attr('disabled', true);
 	} else {
+		d3.select(this).classed('inactive', false);
+		d3.select(this).classed('active_bis', true);
+		d3.select(this).classed('active', true);
 		d3.select('.circles')
 			.selectAll('circle').style('opacity', 1);
 		d3.select('.averageLines')
 			.selectAll('line.all').style('display', 'block');
+		bestSongsButton.attr('disabled', null);
 	}
 });
 
@@ -622,6 +829,18 @@ d3.selectAll('.band-img').on('mouseout', function(){
 });
 
 d3.selectAll('.band-img').on('click', function(){
+	var bestSongsButton = d3.select('#bestSongsButton');
+	if(bestSongsButton.classed('active')){
+		bestSongsButton.classed('active', false);
+		container4.select('.circles')
+					.selectAll('circle')
+					.style('display', 'block');
+		container4.select('.bestSongsCircles')
+					.style('display', 'none')
+					.selectAll('circle')
+					.style('display', 'none');
+	}
+
 	var clickedID = d3.select(this).attr('id');
 	if(d3.select(this).classed('active-artist')){
 		d3.select(this).classed('active-artist', false);
@@ -639,9 +858,11 @@ d3.selectAll('.band-img').on('click', function(){
 				.selectAll('line').style('display', 'none');
 			d3.select('.averageLines')
 				.selectAll('line.all').style('display', 'block');
+
+			bestSongsButton.attr('disabled', null);	
 		} else{
 			decadeButtonsShowHideCircles();
-		}		
+		}	
 	} else {
 		d3.selectAll('.band-img').classed('active-artist', false);
 		d3.select(this).classed('active-artist', true);
@@ -663,9 +884,35 @@ d3.selectAll('.band-img').on('click', function(){
 				d3.select('.circles').selectAll('circle.' + val).style('opacity', 0);
 			});
 		}
+		bestSongsButton.attr('disabled', true);
 	}	
 });
 
+// Best songs of all time logic
+var bestSongsButton = d3.select('#bestSongsButton');
+bestSongsButton.on('click', function(){
+	if(bestSongsButton.classed('active')){
+		bestSongsButton.classed('active', false);
+		container4.select('.circles')
+					.selectAll('circle')
+					.style('display', 'block');
+		container4.select('.bestSongsCircles')
+					.style('display', 'none')
+					.selectAll('circle')
+					.style('display', 'none');
+	} else {
+		bestSongsButton.classed('active', true);
+		container4.select('.circles')
+					.selectAll('circle')
+					.style('display', 'none');
+		container4.select('.bestSongsCircles')
+					.style('display', 'block')
+					.selectAll('circle')
+					.style('display', 'block');
+	}
+});
+
+// Glyphicon
 var playingIcon = container4.select('.circles')
 						.append("svg:foreignObject")
 							.attr("width", 20)
